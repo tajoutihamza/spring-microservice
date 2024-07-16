@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/articles")
@@ -56,7 +57,7 @@ public class ArticleController {
                     return ResponseEntity.ok().build();
                 }).orElse(ResponseEntity.notFound().build());
     }
-    @GetMapping("/{id}/with-stock")
+    @GetMapping("/with-stock/{id}")
     public ResponseEntity<ArticleDto> getArticleWithStockInfo(@PathVariable Long id) {
         ArticleDto responseDTO = articleService.getArticleWithStockInfo(id);
         if (responseDTO != null) {
@@ -65,7 +66,7 @@ public class ArticleController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/{id}/stock")
+    @GetMapping("/stock/{id}")
     public ResponseEntity<DtoArticle> getArticleWithStockDto(@PathVariable Long id) {
         DtoArticle responseDTO = articleService.getArticleWithStockDto(id);
         if (responseDTO != null) {
@@ -73,5 +74,12 @@ public class ArticleController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+    @GetMapping("/stock")
+    public ResponseEntity<List<ArticleDto>> getArticlesWithStockDto() {
+
+        return ResponseEntity.ok(articleService.findAll().stream().map(article -> {
+            return articleService.getArticleWithStockInfo(article.getId());
+        }).collect(Collectors.toList()));
     }
 }
