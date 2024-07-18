@@ -11,9 +11,9 @@
     <groupId>com.ms</groupId>
     <artifactId>Medicine</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
-    <name>Article</name>
-    <description>Article</description>
+    <packaging>jar</packaging>
+    <name>Medicine</name>
+    <description>Medicine</description>
     <url/>
     <licenses>
         <license/>

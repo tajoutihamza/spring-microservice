@@ -11,9 +11,9 @@
     <groupId>com.ms</groupId>
     <artifactId>Pharmacy</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
-    <name>Stock</name>
-    <description>Stock</description>
+    <packaging>jar</packaging>
+    <name>Pharmacy</name>
+    <description>Pharmacy</description>
     <url/>
     <licenses>
         <license/>
