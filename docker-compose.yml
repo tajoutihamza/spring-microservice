@@ -108,6 +108,7 @@ services:
 
 networks:
   backend:
+    external: true
 
 volumes:
   mongo-data:
