@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  configserver:
+    container_name: configserver
+    image: config-server
+    build:
+      context: ./ConfigServer
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    networks:
+      - backend
+    restart: unless-stopped
+
   discoveryservice:
     container_name: discoveryservice
     image: discovery-service
@@ -13,7 +25,11 @@ services:
       - backend
     environment:
       - HOSTNAME=discoveryservice
+      - PROFILE=prod
+      - SPRING_CLOUD_CONFIG_URI=http://configserver:8888
     restart: unless-stopped
+    depends_on:
+      - configserver
 
   pharmacyservice:
     container_name: pharmacyservice
@@ -26,14 +42,16 @@ services:
     networks:
       - backend
     environment:
-#      - SPRING_PROFILES_ACTIVE=dev
       - MONGO_HOST=mongo
       - EUREKA_URI=http://discoveryservice:8761/eureka/
       - HOSTNAME=pharmacyservice
+      - PROFILE=prod
+      - SPRING_CLOUD_CONFIG_URI=http://configserver:8888
     depends_on:
       - discoveryservice
       - mongo
       - gatewayapiservice
+      - configserver
     restart: unless-stopped
 
   medicineservice:
@@ -47,18 +65,20 @@ services:
     networks:
       - backend
     environment:
-#      - SPRING_PROFILES_ACTIVE=dev
       - MYSQL_URI=jdbc:mysql://mysql:3306/med?createDatabaseIfNotExist=true
       - MYSQL_USERNAME=root
       - MYSQL_PASSWORD=rootpassword
       - EUREKA_URI=http://discoveryservice:8761/eureka/
       - PHARMACY_SERVICE_URI=http://pharmacyservice:8080/pharmacy
       - HOSTNAME=medicineservice
+      - PROFILE=prod
+      - SPRING_CLOUD_CONFIG_URI=http://configserver:8888
     depends_on:
       - discoveryservice
       - gatewayapiservice
       - mysql
       - pharmacyservice
+      - configserver
     restart: unless-stopped
 
   gatewayapiservice:
@@ -72,13 +92,15 @@ services:
     networks:
       - backend
     environment:
-#      - SPRING_PROFILES_ACTIVE=dev
       - EUREKA_URI=http://discoveryservice:8761/eureka/
       - HOSTNAME=gatewayapiservice
+      - PROFILE=prod
+      - SPRING_CLOUD_CONFIG_URI=http://configserver:8888
 #      - PHARMACY_SERVICE_URI=http://pharmacyservice:8080
 #      - MEDICINE_SERVICE_URI=http://medicineservice:9090
     depends_on:
       - discoveryservice
+      - configserver
     restart: unless-stopped
 
   mongo:
@@ -108,6 +130,7 @@ services:
 
 networks:
   backend:
+    external: true
 
 volumes:
   mongo-data:
