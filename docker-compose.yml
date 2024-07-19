@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  discovery-service:
-    container_name: discovery-service
+  discoveryservice:
+    container_name: discoveryservice
     image: discovery-service
     build:
       context: ./discovery-service
@@ -12,11 +12,11 @@ services:
     networks:
       - backend
     environment:
-      - HOSTNAME=discovery-service
+      - HOSTNAME=discoveryservice
     restart: unless-stopped
 
-  pharmacy-service:
-    container_name: pharmacy-service
+  pharmacyservice:
+    container_name: pharmacyservice
     image: pharmacy-service
     build:
       context: ./pharmacy-service
@@ -28,16 +28,16 @@ services:
     environment:
 #      - SPRING_PROFILES_ACTIVE=dev
       - MONGO_HOST=mongo
-      - EUREKA_URI=http://discovery-service:8761/eureka/
-      - HOSTNAME=pharmacy-service
+      - EUREKA_URI=http://discoveryservice:8761/eureka/
+      - HOSTNAME=pharmacyservice
     depends_on:
-      - discovery-service
+      - discoveryservice
       - mongo
-      - gateway-api-service
+      - gatewayapiservice
     restart: unless-stopped
 
-  medicine-service:
-    container_name: medicine-service
+  medicineservice:
+    container_name: medicineservice
     image: medicine-service
     build:
       context: ./medicine-service
@@ -51,18 +51,18 @@ services:
       - MYSQL_URI=jdbc:mysql://mysql:3306/med?createDatabaseIfNotExist=true
       - MYSQL_USERNAME=root
       - MYSQL_PASSWORD=rootpassword
-      - EUREKA_URI=http://discovery-service:8761/eureka/
-      - PHARMACY_SERVICE_URI=http://pharmacy-service:8080/pharmacy
-      - HOSTNAME=medicine-service
+      - EUREKA_URI=http://discoveryservice:8761/eureka/
+      - PHARMACY_SERVICE_URI=http://pharmacyservice:8080/pharmacy
+      - HOSTNAME=medicineservice
     depends_on:
-      - discovery-service
-      - gateway-api-service
+      - discoveryservice
+      - gatewayapiservice
       - mysql
-      - pharmacy-service
+      - pharmacyservice
     restart: unless-stopped
 
-  gateway-api-service:
-    container_name: gateway-api-service
+  gatewayapiservice:
+    container_name: gatewayapiservice
     image: gateway-api-service
     build:
       context: ./gateway-api-service
@@ -73,12 +73,12 @@ services:
       - backend
     environment:
 #      - SPRING_PROFILES_ACTIVE=dev
-      - EUREKA_URI=http://discovery-service:8761/eureka/
-      - HOSTNAME=gateway-api-service
-#      - PHARMACY_SERVICE_URI=http://pharmacy-service:8080
-#      - MEDICINE_SERVICE_URI=http://medicine-service:9090
+      - EUREKA_URI=http://discoveryservice:8761/eureka/
+      - HOSTNAME=gatewayapiservice
+#      - PHARMACY_SERVICE_URI=http://pharmacyservice:8080
+#      - MEDICINE_SERVICE_URI=http://medicineservice:9090
     depends_on:
-      - discovery-service
+      - discoveryservice
     restart: unless-stopped
 
   mongo:
